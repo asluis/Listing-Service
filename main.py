@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route('/api/v1/')
 def main():
-    return '''This is University Pal's Listing microservice for everything related to a listing.'''
+    return {'response':'''This is University Pal's Listing microservice for everything related to a listing.'''}
 
 
 
