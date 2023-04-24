@@ -26,8 +26,8 @@ def main() -> dict:
 
 # Creates all tables
 def createTables() -> None:
-    app.app_context().push()
-    db.create_all()
+    with app.app_context():
+        db.create_all()
 
 
 if __name__ == '__main__':
