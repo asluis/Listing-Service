@@ -6,3 +6,6 @@
 
 # Ignore generated files
 *.txt
+
+# Ignore python generated cache files
+*__pycache__*
