@@ -48,6 +48,53 @@ def create_listing(uid: str = None, title: str = None, price: float = 0.00, desc
 
 
 """
+GET: /api/v1/listing/<listing_id>
+
+Fetches the listing's data identified with <listing_id> from the DB and returns 
+that listing's information and all images associated with that listing_id.
+"""
+@app.route('/api/v1/listing/<listing_id>', methods=['GET'])
+def get_listing(listing_id: int = None) -> Response:
+
+    if listing_id is None:
+        return jsonify({'success': False})
+
+    listing = None
+    images = dict()
+
+    try:
+        # Fetch listing
+        listing = db.session.query(Listing).filter(Listing.listing_id == listing_id).first()
+        if listing is None:
+            raise DataError(statement='listing_id DNE', params=None, orig=None)
+
+        # Get images associated with listing
+        images = getImages(listing_id=listing_id).json
+
+    except DatabaseError or DataError or IntegrityError:
+        db.session.rollback()
+        db.session.flush()
+        return jsonify({'success': False})
+
+    return jsonify({
+        'success': True,
+        'listing_data': {
+            'listing_id': listing.listing_id,
+            'title': listing.title,
+            'tags': listing.tags,
+            'description': listing.description,
+            'price': listing.price,
+            'owner': listing.owner
+        },
+        'image_data': {
+            'data': images['data'] or None,
+            'data_length': images['data_length'] or None,
+            'success': images['success'] or None
+        }
+    })
+
+
+"""
 POST: /api/v1/images/?imgs=[]&listing_id=INT
 * Requires
     - imgs: a list of images (files)
@@ -64,7 +111,6 @@ def postImages() -> Response:
 
     # Add each image to db and commit
     for i in range(len(imgs)):
-        app.logger.info(f'TEST: {imgs[i]}')
         image_mimetype = image_data.mimetype
         image_data = imgs[i].read()  # Gets data for ith image
 
@@ -96,6 +142,8 @@ GET: /api/v1/images/<listing_id>
         - mimetype: type of image (jpg vs jpeg vs png vs ...)
         - listing_id: listing_id this image belongs to
     - data_length: number of images returned
+    
+TODO: Test
 """
 @app.route('/api/v1/images/<listing_id>', methods=['GET'])
 def getImages(listing_id: int = None) -> Response:
@@ -128,7 +176,7 @@ def getImages(listing_id: int = None) -> Response:
     return jsonify({
         'success': True,
         'data': data,
-        'data_length': len(data)
+        'data_length': len(data) + 1
     })
 
 
