@@ -7,16 +7,14 @@ class Listing(db.Model):
     tags = db.Column(db.String(30), nullable=False)
     description = db.Column(db.String(200), nullable=False)
     price = db.Column(db.Float, nullable=False)
-    images = db.Column(db.String(1000), nullable=True)
     owner = db.Column(db.String(50), nullable=False)
 
-    def __init__(self, listing_id, title, tags, description, price, images, owner):
+    def __init__(self, listing_id, title, tags, description, price, owner):
         self.listing_id = listing_id
         self.title = title
         self.tags = tags
         self.description = description
         self.price = price
-        self.images = images
         self.owner = owner
 
 

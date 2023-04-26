@@ -28,12 +28,11 @@ def main() -> Response:
 
 # Creates a listing. Requires that ALL parameters have a value.
 @app.route('/api/v1/create/<uid>/<title>/<price>/<desc>/<images>/<tags>', methods=['POST'])
-def create_listing(uid: str = None, title: str = None, price: float = 0.00, desc: str = "", images: str = None,
-                   tags: str = None) -> Response:
-    if uid is None or title is None or price is None or desc is None or images is None or tags is None:
+def create_listing(uid: str = None, title: str = None, price: float = 0.00, desc: str = "", tags: str = None) -> Response:
+    if uid is None or title is None or price is None or desc is None or tags is None:
         return jsonify({'success': False})
 
-    new_listing = Listing(None, title, tags, desc, price, bin(int(images, 2)), uid)
+    new_listing = Listing(None, title, tags, desc, price, uid)
     db.session.add(new_listing)
 
     try:
