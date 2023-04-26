@@ -1,7 +1,8 @@
 from main import db
 
 class Listing(db.Model):
-    listing_id = db.Column(db.Integer, primary_key=True)
+    __tablename__ = 'Listings'
+    listing_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(60), nullable=False)
     tags = db.Column(db.String(30), nullable=False)
     description = db.Column(db.String(200), nullable=False)
