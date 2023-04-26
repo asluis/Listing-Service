@@ -1,4 +1,4 @@
-from models.shared import db
+from models.shared.db import db
 
 class Images(db.Model):
     __tablename__ = 'Images'
