@@ -27,8 +27,9 @@ def main() -> Response:
                     'response': "This is University Pal's Listing microservice for everything related to a listing."})
 
 # Creates a listing. Requires that ALL parameters have a value.
-@app.route('/api/v1/create/<uid>/<title>/<price>/<desc>/<images>/<tags>', methods=['POST'])
-def create_listing(uid: str = None, title: str = None, price: float = 0.00, desc: str = "", tags: str = None) -> Response:
+@app.route('/api/v1/create/<uid>/<title>/<price>/<desc>/<tags>', methods=['POST'])
+def create_listing(uid: str = None, title: str = None, price: float = 0.00, desc: str = "",
+                   tags: str = None) -> Response:
     if uid is None or title is None or price is None or desc is None or tags is None:
         return jsonify({'success': False})
 
