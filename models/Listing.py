@@ -1,6 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from models.shared.db import db
 
 class Listing(db.Model):
     __tablename__ = 'Listings'
@@ -9,7 +7,7 @@ class Listing(db.Model):
     tags = db.Column(db.String(30), nullable=False)
     description = db.Column(db.String(200), nullable=False)
     price = db.Column(db.Float, nullable=False)
-    images = db.Column(db.LargeBinary, nullable=True)
+    images = db.Column(db.String(1000), nullable=True)
     owner = db.Column(db.String(50), nullable=False)
 
     def __init__(self, listing_id, title, tags, description, price, images, owner):
