@@ -5,6 +5,7 @@ from models.Listing import Listing
 from models.Images import Images
 from models.shared.db import db, db_init
 from flask import jsonify
+import json
 
 app = Flask(__name__)
 
@@ -176,7 +177,7 @@ def getImages(listing_id: int = None) -> Response:
     return jsonify({
         'success': True,
         'data': data,
-        'data_length': len(data) + 1
+        'data_length': len(data)
     })
 
 
@@ -198,6 +199,60 @@ def delete(listing_id: int = None) -> Response:
         return jsonify({'success': False})
 
     return jsonify({'success': True})
+
+
+"""
+api/v1/search endpoint accepts query parameters in URL.
+Searches database and returns matching rows. Can search for tite, tags, or description.
+"""
+@app.route('/api/v1/search')
+def search() -> Response:
+    title_search = request.args.get('title') or ''
+    tag_search = request.args.get('tags') or ''
+    desc_search = request.args.get('desc') or ''
+
+    if title_search == '' and tag_search == '' and desc_search == '':
+        return jsonify({'success': False})
+
+    prep_str = lambda s: f'%{s}%'
+
+    title_search = prep_str(title_search)
+    tag_search = prep_str(tag_search)
+    desc_search = prep_str(desc_search)
+
+    listings_query = []
+
+    try:
+        listings_query = db.session.query(Listing).filter(
+            Listing.title.like(title_search),
+            Listing.tags.like(tag_search),
+            Listing.description.like(desc_search)
+        ).all()
+    except DatabaseError or DataError or IntegrityError:
+        db.session.rollback()
+        db.session.flush()
+        return jsonify({'success': False})
+
+    data = {}
+
+    for i in range(len(listings_query)):
+        curr_listing = listings_query[i]
+
+        curr_data = {
+            'listing_id': curr_listing.listing_id,
+            'title': curr_listing.title,
+            'tags': curr_listing.tags,
+            'price': curr_listing.price,
+            'owner': curr_listing.owner
+        }
+
+        data[f'{i}'] = curr_data
+
+    return jsonify({
+        'success': True,
+        'data': data,
+        'data_len': len(data)
+    })
 
 
 if __name__ == '__main__':
