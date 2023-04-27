@@ -180,6 +180,26 @@ def getImages(listing_id: int = None) -> Response:
     })
 
 
+"""
+Deletes the listing_id passed to endpoint.
+"""
+@app.route('/api/v1/delete/<listing_id>', methods=['POST'])
+def delete(listing_id: int = None) -> Response:
+    if listing_id is None:
+        return jsonify({'success': False})
+
+    try:
+        db.session.query(Listing).filter(Listing.listing_id == listing_id).delete()
+        db.session.query(Images).filter(Images.listing_id == listing_id).delete()
+        db.session.commit()
+    except DatabaseError or DataError or IntegrityError:
+        db.session.rollback()
+        db.session.flush()
+        return jsonify({'success': False})
+
+    return jsonify({'success': True})
+
+
 if __name__ == '__main__':
     db_init(app)
     app.run(host='localhost', port=5050, debug=True)
