@@ -5,10 +5,8 @@ from models.Listing import Listing
 from models.Images import Images
 from models.shared.db import db, db_init
 from flask import jsonify
-import json
 
 app = Flask(__name__)
-
 
 '''
 DB Username is UniPal
@@ -161,18 +159,17 @@ def getImages(listing_id: int = None) -> Response:
         db.session.flush()
         return jsonify({'success': False})
 
-    data: [dict] = []
-    # Iterate thru all images fetched from DB and add each image's data into a dict, which is then added to a list
+    data = {}
+    # Iterate thru all images fetched from DB and add each image's data into a dict
     for i in range(len(images_query)):
         curr_image = images_query[i]
         curr_data = {
-            'count': i,
             'img': curr_image.data,
             'mimetype': curr_image.mimetype,
             'listing_id': curr_data.listing_id
         }
 
-        data.append(curr_data)
+        data[f'{i}'] = curr_data
 
     return jsonify({
         'success': True,
@@ -234,7 +231,7 @@ def search() -> Response:
         return jsonify({'success': False})
 
     data = {}
-
+    # Iterate thru all listings fetched from DB and add each listing's data into a dict
     for i in range(len(listings_query)):
         curr_listing = listings_query[i]
 
