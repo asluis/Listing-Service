@@ -181,7 +181,7 @@ def getImages(listing_id: int = None) -> Response:
 """
 Deletes the listing_id passed to endpoint.
 """
-@app.route('/api/v1/delete/<listing_id>', methods=['POST'])
+@app.route('/api/v1/delete/<listing_id>', methods=['DELETE'])
 def delete(listing_id: int = None) -> Response:
     if listing_id is None:
         return jsonify({'success': False})
