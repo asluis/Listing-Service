@@ -252,6 +252,53 @@ def search() -> Response:
     })
 
 
+"""
+Edit the listing_id passed to endpoint.
+"""
+@app.route('/api/v1/edit/<listing_id>', methods=['POST'])
+def edit_listing(listing_id: int = None) -> Response:
+    if listing_id is None:
+        return jsonify({'success': False})
+
+    listing = None
+    update_listing = None
+
+    try:
+        # Fetch listing
+        listing = db.session.query(Listing).filter(Listing.listing_id == listing_id).first()
+        if listing is None:
+            raise DataError(statement='listing_id DNE', params=None, orig=None)
+
+        # Update listing attributes
+        listing.title = request.args.get('title') or ''
+        listing.tags = request.args.get('tags') or ''
+        listing.description = request.args.get('description') or ''
+        listing.price = float(request.args.get('price') or 0)
+
+        # Commit changes to the database
+        db.session.commit()
+
+        # Fetch updated listing
+        updated_listing = db.session.query(Listing).filter(Listing.listing_id == listing_id).first()
+
+    except (DatabaseError, DataError, IntegrityError):
+        db.session.rollback()
+        db.session.flush()
+        return jsonify({'success': False})
+
+    return jsonify({
+        'success': True,
+        'listing_data': {
+            'listing_id': updated_listing.listing_id,
+            'title': updated_listing.title,
+            'tags': updated_listing.tags,
+            'description': updated_listing.description,
+            'price': updated_listing.price,
+            'owner': updated_listing.owner,
+        }
+    })
+
+
 if __name__ == '__main__':
     db_init(app)
     app.run(host='localhost', port=5050, debug=True)
