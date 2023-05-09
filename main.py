@@ -255,12 +255,13 @@ def search() -> Response:
 """
 Edit the listing_id passed to endpoint.
 """
-@app.route('/api/v1/edit/<listing_id>', methods=['PUT'])
+@app.route('/api/v1/edit/<listing_id>', methods=['POST'])
 def edit_listing(listing_id: int = None) -> Response:
     if listing_id is None:
         return jsonify({'success': False})
 
     listing = None
+    update_listing = None
 
     try:
         # Fetch listing
@@ -269,14 +270,10 @@ def edit_listing(listing_id: int = None) -> Response:
             raise DataError(statement='listing_id DNE', params=None, orig=None)
 
         # Update listing attributes
-        if 'title' in request.json:
-            listing.title = request.json['title']
-        if 'tags' in request.json:
-            listing.tags = request.json['tags']
-        if 'description' in request.json:
-            listing.description = request.json['description']
-        if 'price' in request.json:
-            listing.price = float(request.json['price'])
+        listing.title = request.args.get('title') or ''
+        listing.tags = request.args.get('tags') or ''
+        listing.description = request.args.get('description') or ''
+        listing.price = float(request.args.get('price') or 0)
 
         # Commit changes to the database
         db.session.commit()
@@ -297,7 +294,7 @@ def edit_listing(listing_id: int = None) -> Response:
             'tags': updated_listing.tags,
             'description': updated_listing.description,
             'price': updated_listing.price,
-            'owner': updated_listing.owner
+            'owner': updated_listing.owner,
         }
     })
 
