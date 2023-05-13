@@ -240,6 +240,7 @@ def search() -> Response:
             'title': curr_listing.title,
             'tags': curr_listing.tags,
             'price': curr_listing.price,
+            'description': curr_listing.description,
             'owner': curr_listing.owner
         }
 
